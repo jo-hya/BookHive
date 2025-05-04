@@ -1,0 +1,33 @@
+<!--
+References
+* 
+-->
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+  <h2>Your Collections</h2>
+  <div class="row">
+      {% for collection in authorized_collections %}
+    <div class="col-md-6 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ collection.title }}</h5>
+          <p class="card-text">{{ collection.description }}</p>
+          <a href="{% url 'collection_detail' collection.id %}" class="btn btn-outline-primary">View Details</a>
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <h5 class="card-title mb-0">{{ coll.title }}</h5>
+                {% if collection.is_public %}
+                    <span class="badge bg-success">Public</span>
+                {% else %}
+                    <span class="badge bg-secondary">Private</span>
+                {% endif %}
+            </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+      <p class="text-muted">No collections available.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

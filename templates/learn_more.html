@@ -1,0 +1,68 @@
+<!--
+References
+*
+-->
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Learn More{% endblock title %}
+
+{% block content %}
+  <h1>About Us</h1>
+  <p>
+    Welcome to BookHive – a community-based textbook lending and borrowing platform designed to make sharing academic resources simple, efficient, and sustainable. Our system is built as part of a class project in Cataloging and Lending Apps (CLAs) and adheres to modern best practices in cloud hosting, data management, and security.
+  </p>
+
+  <h2>Our Mission</h2>
+  <p>
+    At BookHive, we believe education should be accessible to everyone. By enabling students and educators to share textbooks, we help reduce costs, minimize waste, and support a sustainable educational ecosystem.
+  </p>
+
+  <!--<div class="d-flex justify-content-center mb-2">
+    <img src="{% static 'images/bookstack.png' %}" alt="Book Stack" class="img-fluid" style="margin-top: -20px;">
+  </div> -->
+
+  <h2>How BookHive Works</h2>
+  <p>
+    BookHive is built using Python 3, Django 5, and PostgreSQL for robust performance and reliability. We integrate Google user accounts for secure, streamlined login, and utilize Amazon S3 for managing file uploads—ensuring that textbook images and documents are stored safely in the cloud.
+  </p>
+
+  <h3>User Roles & Permissions</h3>
+  <ul>
+    <li>
+      <strong>Anonymous Users:</strong> Can browse textbooks available in public collections and items not assigned to any collection, but cannot rate, comment, or request to borrow.
+    </li>
+    <li>
+      <strong>Patrons:</strong> Sign in using their Google account to create a profile and request to borrow textbooks. Importantly, patrons are limited to borrowing only and cannot lend textbooks.
+    </li>
+    <li>
+      <strong>Librarians:</strong> Manage the catalog by adding, editing, and deleting textbook listings and collections. They also review and process borrowing requests from patrons. Note that librarians do not borrow textbooks.
+    </li>
+  </ul>
+
+  <h2>Core Features</h2>
+  <p>
+    Each textbook listing (item) includes:
+  </p>
+  <ul>
+    <li><strong>Title</strong> and <strong>Unique Identifier</strong> (e.g., barcode, ISBN)</li>
+    <li><strong>Status</strong> (e.g., checked-in, in circulation, under repair)</li>
+    <li><strong>Location</strong> (e.g., home library, campus library)</li>
+    <li><strong>Description</strong> and detailed information</li>
+    <li><strong>Representative Images</strong> showing the condition of the books</li>
+    <li><strong>Ratings and Comments</strong> from users</li>
+    <li>Association with one or more <strong>Collections</strong> (curated groups of textbooks)</li>
+  </ul>
+  <p>
+    Collections can be public or private. Private collections are visible only to authorized users (with librarians always having full access) and can include items exclusively assigned to them.
+  </p>
+
+  <h2>Search & Navigation</h2>
+  <p>
+    Our powerful search functionality lets users find textbooks and collections by title, keywords, or tags—making it easy to discover the resources you need.
+  </p>
+
+  <h2>Community & Sustainability</h2>
+  <p>
+    Whether you’re a patron looking for affordable access to textbooks or a librarian dedicated to maintaining a comprehensive resource catalog, BookHive connects you with a community committed to sharing and sustainability.
+  </p>
+{% endblock content %}

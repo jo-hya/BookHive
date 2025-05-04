@@ -1,0 +1,91 @@
+<!--
+References
+* 
+-->
+{% extends 'base.html' %}
+{% load static %}
+{% load socialaccount %}
+
+{% block title %}Patron View{% endblock title %}
+
+{% block content %}
+<div class="text-center">
+  <h2>Hello Patron {{ user.first_name }}!</h2>
+  {% if user.userprofile.profile_picture %}
+    <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile Picture" width="150">
+  {% else %}
+    <p>No profile picture uploaded.</p>
+  {% endif %}
+  <p class="lead">Manage your collections.</p>
+
+  <a href="{% url 'add_collection' %}" class="btn btn-primary mb-3">Add Collection</a>
+
+  <h3>My Collections</h3>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for collection in collections %}
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ collection.title }}</h5>
+            <p class="card-text">
+              Description: {{ collection.description|truncatewords:10 }}<br>
+              Visibility: {% if collection.is_public %}Public{% else %}Private{% endif %}<br>
+              Items: {{ collection.items.count }}
+            </p>
+            <a href="{% url 'collection_detail' collection.id %}" class="btn btn-primary">View Details</a>
+            <a href="{% url 'edit_collection' collection.id %}" class="btn btn-warning">Edit</a>
+            <form method="POST" action="{% url 'delete_collection' collection.id %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete {{ collection.title }}?');">Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col">
+        <p>No collections yet.</p>
+      </div>
+    {% endfor %}
+  </div>
+
+  <h3>Authorized Collections</h3>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for collection in authorized_collections %}
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ collection.title }}</h5>
+            <p class="card-text">
+              Description: {{ collection.description|truncatewords:10 }}<br>
+              Visibility: {% if collection.is_public %}Public{% else %}Private{% endif %}<br>
+              Items: {{ collection.items.count }}
+            </p>
+            <a href="{% url 'collection_detail' collection.id %}" class="btn btn-primary">View Details</a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col">
+        <p>No collections yet.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<h3>Private Collections You Are Not Authorized For</h3>
+{% if other_private_collections %}
+  <ul>
+  {% for coll in other_private_collections %}
+    <li>
+      {{ coll.title }} 
+      <a href="{% url 'request_collection_access' coll.id %}" class="btn btn-warning btn-sm">
+        Request Access
+      </a>
+    </li>
+  {% endfor %}
+  </ul>
+{% else %}
+  <p>No private collections you’re unaware of.</p>
+{% endif %}
+
+{% endblock content %}

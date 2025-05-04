@@ -1,0 +1,19 @@
+<!--
+References
+*
+-->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <h2>{{ book.title }}</h2>
+    <p>Author: {{ book.author }}</p>
+    <p>Subject: {{ book.subject|default:"N/A" }}</p>
+    {% if book.book_picture %}
+      <img src="{{ book.book_picture.url }}" alt="{{ book.title }}">
+    {% else %}
+      <img src="{% static 'images/default_book.png' %}" alt="{{ book.title }}">
+    {% endif %}
+</div>
+{% endblock %}

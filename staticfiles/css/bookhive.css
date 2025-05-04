@@ -1,0 +1,4 @@
+/* Make all text bold */
+* {
+  font-weight: bold !important;
+}

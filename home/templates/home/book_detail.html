@@ -1,0 +1,172 @@
+<!--
+References
+* https://stackoverflow.com/questions/39325414/line-break-in-html-with-n
+-->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Book: {{ book.title }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'browse/css/browse_style.css' %}">
+
+<div class="container py-5">
+  <!-- back -->
+  <button class="btn btn-link mb-4" onclick="window.history.back()">
+    ← Back
+  </button>
+
+  <!-- top section: cover + meta -->
+  <div class="row mb-5">
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        {% if book.book_picture %}
+          <img src="{{ book.book_picture.url }}"
+               class="card-img-top"
+               alt="{{ book.title }}"
+               style="object-fit: contain; max-height: 400px;">
+        {% else %}
+          <img src="{% static 'images/default_book.png' %}"
+               class="card-img-top"
+               alt="No cover"
+               style="object-fit: contain; max-height: 400px;">
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card shadow-sm p-4 h-100">
+        <h2 class="card-title">{{ book.title }}</h2>
+        <p class="mb-1"><strong>Author:</strong> {{ book.author|default:"N/A" }}</p>
+        <p class="mb-1"><strong>ISBN:</strong> {{ book.isbn|default:"N/A" }}</p>
+        <p class="mb-1"><strong>Subject:</strong> {{ book.subject|default:"N/A" }}</p>
+        <p class="mb-1"><strong>Year:</strong> {{ book.publication_year|default:"N/A" }}</p>
+        <p class="mb-1"><strong>Location:</strong> {{ book.location|default:"N/A" }}</p>
+        <p class="mb-1"><strong>Status:</strong> {{ book.book_status|capfirst }}</p>
+        <p class="mb-1"><strong>Due Date:</strong> 
+          {% if due_date %}
+            {{ due_date|date:"M d, Y" }}
+          {% else %}
+            N/A
+          {% endif %}</p>  
+        <p class="mb-1"><strong>Borrow Length:</strong> {{ book.borrow_length|default:"N/A" }} days</p>
+        <p class="mb-3"><strong>Description: </strong>{{ book.description|default:"No description available." }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- collections list -->
+  <div class="card shadow-sm mb-5 p-4">
+    <h4>Collections containing this book</h4>
+    {% if book.collections.exists %}
+      <ul class="list-group list-group-flush">
+        {% for coll in book.collections.all %}
+          <li class="list-group-item">
+            <a href="{% url 'collection_detail' coll.id %}">{{ coll.title }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>Not in any collections.</p>
+    {% endif %}
+  </div>
+    
+    <!-- image list -->
+  <div class="card shadow-sm mb-5 p-4">
+    <h4>Extra Images</h4>
+    {% if book.images.all %}
+        {% for image in book.images.all %}
+            <img src="{{ image.image.url }}" alt="Image" style="max-width: 300px; margin-bottom: 10px;">
+        {% endfor %}
+    {% else %}
+        <p>No images uploaded yet.</p>
+    {% endif %}
+      
+    {% if request.user.is_authenticated and request.user.userprofile.user_type == "librarian" %}
+      <h4>Upload a New Image</h4>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="image" required>
+            <button type="submit">Upload</button>
+        </form>
+    {% endif %}
+  
+  </div>
+
+  <!-- ratings & comments side by side -->
+  <div class="row">
+    <!-- ratings -->
+    <div class="col-md-6">
+      <div class="card shadow-sm p-4 mb-4 h-100">
+        <h4>Ratings</h4>
+        <p>
+          <strong>Average:</strong>
+          {% if avg_rating|floatformat:1|stringformat:"s" != "0.0" %}
+            {{ avg_rating|floatformat:1 }} / 5
+          {% else %}
+            N/A
+          {% endif %}
+        </p>
+        {% if user.is_authenticated %}
+          <form method="post">
+            {% csrf_token %}
+            <div class="d-flex align-items-center">
+              {{ rating_form.rating.label_tag }}
+              {{ rating_form.rating }}
+              <button type="submit"
+                      name="rating_submit"
+                      class="btn btn-primary btn-sm ms-2">
+                {% if user_has_rated %}Update{% else %}Submit{% endif %}
+              </button>
+            </div>
+            {% if rating_form.rating.errors %}
+              <small class="text-danger">{{ rating_form.rating.errors }}</small>
+            {% endif %}
+          </form>
+        {% else %}
+          <p><a href="{% url 'account_login' %}">Log in</a> to rate this book.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- comments -->
+    <div class="col-md-6">
+      <div class="card shadow-sm p-4 mb-4 h-100">
+        <h4>Comments</h4>
+        {% if comments %}
+          <ul class="list-group list-group-flush mb-3">
+            {% for c in comments %}
+              <li class="list-group-item">
+                <strong>{{ c.user.user.username }}</strong>
+                <small class="text-muted">— {{ c.created_at|date:"M d, Y" }}</small>
+                <p class="mb-0">{{ c.content }}</p>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>No comments yet.</p>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-2">
+              {{ comment_form.content }}
+            </div>
+            <button type="submit"
+                    name="comment_submit"
+                    class="btn btn-primary btn-sm">
+              {% if user_has_commented %}Update{% else %}Submit{% endif %}
+            </button>
+            {% if comment_form.content.errors %}
+              <small class="text-danger">{{ comment_form.content.errors }}</small>
+            {% endif %}
+          </form>
+        {% else %}
+          <p><a href="{% url 'account_login' %}">Log in</a> to comment.</p>
+        {% endif %}
+      </div>
+    
+    </div>
+  </div>
+</div>
+{% endblock %}

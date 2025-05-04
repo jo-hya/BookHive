@@ -1,0 +1,141 @@
+<!--
+References
+* 
+-->
+{% extends 'base.html' %}
+{% load static %}
+{% load socialaccount %}
+
+{% block title %}Librarian View{% endblock title %}
+
+{% block content %}
+<div class="container my-4">
+  <div class="text-center">
+    <h2>Hello {{ user.userprofile.user_type }} {{ user.first_name }}!</h2>
+    {% if user.userprofile.profile_picture %}
+      <img src="{{ user.userprofile.profile_picture.url }}" alt="Profile Picture" width="150">
+    {% else %}
+      <p>No profile picture uploaded.</p>
+    {% endif %}
+    <p class="lead">Manage your books and collections.</p>
+
+    <!-- Buttons for adding content -->
+    <a href="{% url 'add_book' %}" class="btn btn-primary mb-3">Add Book</a>
+    <a href="{% url 'add_collection' %}" class="btn btn-primary mb-3">Add Collection</a>
+  </div>
+
+  <!-- Section: My Books -->
+  <h3>My Books</h3>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for book in books %}
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ book.title }}</h5>
+            <p class="card-text">
+              Author: {{ book.author }}<br>
+              ISBN: {{ book.isbn }}
+            </p>
+            <a href="{% url 'book_detail' book.id %}" class="btn btn-primary">View Details</a>
+            <a href="{% url 'edit_book' book.id %}" class="btn btn-warning">Edit</a>
+            <form method="POST" action="{% url 'delete_book' book.id %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete {{ book.title }}?');">Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col">
+        <p>No books yet.</p>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Section: All Books -->
+  <h3>All Books</h3>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for book in all_books %}
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ book.title }}</h5>
+            <p class="card-text">
+              Author: {{ book.author }}<br>
+              ISBN: {{ book.isbn }}
+            </p>
+            <a href="{% url 'book_detail' book.id %}" class="btn btn-primary">View Details</a>
+            <a href="{% url 'edit_book' book.id %}" class="btn btn-warning">Edit</a>
+            <form method="POST" action="{% url 'delete_book' book.id %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete {{ book.title }}?');">Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col">
+        <p>No books yet.</p>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Section: My Collections -->
+  <h3 class="mt-5">My Collections</h3>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for collection in collections %}
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ collection.title }}</h5>
+            <p class="card-text">
+              Description: {{ collection.description|truncatewords:10 }}<br>
+              Visibility: {% if collection.is_public %}Public{% else %}Private{% endif %}<br>
+              Items: {{ collection.items.count }}
+            </p>
+            <a href="{% url 'collection_detail' collection.id %}" class="btn btn-primary">View Details</a>
+            <a href="{% url 'edit_collection' collection.id %}" class="btn btn-warning">Edit</a>
+            <form method="POST" action="{% url 'delete_collection' collection.id %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete {{ collection.title }}?');">Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col">
+        <p>No collections yet.</p>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Section: Authorized Collections -->
+  <h3 class="mt-5">Authorized Collections</h3>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for collection in authorized_collections %}
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ collection.title }}</h5>
+            <p class="card-text">
+              Description: {{ collection.description|truncatewords:10 }}<br>
+              Visibility: {% if collection.is_public %}Public{% else %}Private{% endif %}<br>
+              Items: {{ collection.items.count }}
+            </p>
+            <a href="{% url 'collection_detail' collection.id %}" class="btn btn-primary">View Details</a>
+            <a href="{% url 'edit_collection' collection.id %}" class="btn btn-warning">Edit</a>
+            <form method="POST" action="{% url 'delete_collection' collection.id %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete {{ collection.title }}?');">Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col">
+        <p>No authorized collections yet.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock content %}

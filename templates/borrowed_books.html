@@ -1,0 +1,147 @@
+<!--
+References
+*
+-->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Borrowed Books{% endblock title %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'browse/css/browse_style.css' %}">
+
+<div class="container py-5">
+
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1>My Borrowed Books</h1>
+      <p class="lead">View and manage the books you’ve borrowed.</p>
+    </div>
+    <div class="col-md-4 align-self-center">
+      <form method="GET" action="{% url 'borrowed_books' %}" class="d-flex">
+        <input type="text" class="form-control me-2" name="q" placeholder="Search your borrowed books..." value="{{ request.GET.q }}">
+        <button class="btn btn-outline-primary" type="submit">Search</button>
+      </form>
+    </div>
+  </div>
+
+  {% if notifications %}
+    <div class="alert alert-info mb-4" role="alert">
+      <h4 class="alert-heading"> You’ve got notifications</h4>
+      <ul class="list-group">
+        {% for note in notifications %}
+          <li class="list-group-item">
+            {{ note.message }}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+
+  <div class="row">
+
+    <!-- Filter Sidebar -->
+    <div class="col-md-3">
+      <h5>Filters</h5>
+      <form method="GET" action="{% url 'borrowed_books' %}">
+        {% if request.GET.q %}
+        <input type="hidden" name="q" value="{{ request.GET.q }}">
+        {% endif %}
+        <div class="mb-3">
+          <label for="categorySelect" class="form-label">Subject</label>
+          <select class="form-select" name="category" id="categorySelect">
+            <option value="">All Subjects</option>
+            {% for subject_name in subjects %}
+              <option value="{{ subject_name }}" {% if request.GET.category == subject_name %}selected{% endif %}>
+                {{ subject_name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <button class="btn btn-secondary" type="submit">Apply Filter</button>
+        <a href="{% url 'borrowed_books' %}" class="btn btn-outline-secondary ms-2">Clear</a>
+      </form>
+    </div>
+
+    <!-- Books Listing -->
+    <div class="col-md-9">
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% if books %}
+          {% for book in books %}
+          <div class="col">
+            <div class="card h-100 shadow-sm">
+              {% if book.book_picture %}
+                <img src="{{ book.book_picture.url }}" class="card-img-top" alt="{{ book.title }}" style="height: 200px; object-fit: contain; padding: 5px;">
+              {% else %}
+                <img src="{% static 'images/default_book.png' %}" class="card-img-top" alt="No image available" style="height: 200px; object-fit: contain; padding: 5px;">
+              {% endif %}
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">{{ book.title }}</h5>
+                <p class="card-text">by {{ book.author }}</p>
+                <p class="card-text"><small class="text-muted">Subject: {{ book.subject|default:"N/A" }}</small></p>
+                <div class="mt-auto d-flex justify-content-between">
+                  <a href="{% url 'book_detail' book.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                  <form method="post" action="{% url 'borrowed_books' %}" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="book_id" value="{{ book.id }}">
+                    <button type="submit" class="btn btn-sm btn-danger">Return</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="col-12">
+            <p class="text-center text-muted mt-5">
+              You haven’t borrowed any books yet.
+            </p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Pagination -->
+      {% if pagination and pagination.paginator.num_pages > 1 %}
+      <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+          {% if pagination.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ pagination.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">Previous</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">Previous</span>
+            </li>
+          {% endif %}
+          {% for page_num in pagination.paginator.page_range %}
+            {% if pagination.number == page_num %}
+              <li class="page-item active" aria-current="page">
+                <span class="page-link">{{ page_num }}</span>
+              </li>
+            {% else %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">{{ page_num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+          {% if pagination.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ pagination.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">Next</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">Next</span>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

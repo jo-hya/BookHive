@@ -1,0 +1,46 @@
+<!--
+References
+* 
+-->
+{% extends 'base.html' %}
+{% load static %}
+{% load socialaccount %}
+
+{% block title %}Home{% endblock title %}
+<!-- CSS -->
+<link rel="stylesheet" href="{% static 'css/bookhive.css' %}">
+
+{% block content %}
+<div class="p-5 mb-4 text-dark rounded-3" style="background-color: #ffd936;">
+    <h1>For all your textbook borrowing and lending needs!</h1>
+    <p class="lead">BookHive!</p>
+    <a href="{% url 'browse' %}" class="btn btn-dark btn-lg">
+      Browse
+    </a>
+</div>
+  
+<div class="text-center">
+  <h1>Welcome to BookHive</h1>
+  <p class="lead">A new way to lend and borrow textbooks!</p>
+  
+  <div class="d-flex justify-content-center mb-2">
+    <img src="{% static 'images/bookstack.png' %}" alt="Book Stack" class="img-fluid" style="margin-top: -20px;">
+  </div>
+
+  {% if not user.is_authenticated %}
+    <a
+      href="{% provider_login_url 'google' %}?next=/"
+      class="btn btn-dark btn-lg mt-2"
+    >
+      Log In or Sign Up
+    </a>
+  {% else %}
+    <a
+      href="{% url 'profile_settings' %}"
+      class="btn btn-secondary btn-lg mt-2"
+    >
+      Profile Settings
+    </a>
+  {% endif %}
+</div>
+{% endblock content %}

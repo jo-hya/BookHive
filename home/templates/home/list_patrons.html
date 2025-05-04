@@ -1,0 +1,47 @@
+<!--
+References
+* 
+-->
+{% extends 'base.html' %}
+{% block title %}Manage Users{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Manage Users</h2>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user_profile in users %}
+        {% if not user_profile.user.is_superuser %}
+            <tr>
+                <td>{{ user_profile.user.username }}</td>
+                <td>{{ user_profile.first_name }} {{ user_profile.last_name }}</td>
+                <td>{{ user_profile.user_type }}</td>
+                <td>
+                {% if user_profile.user_type == "patron" %}
+                    <form method="POST" action="{% url 'upgrade_to_librarian' user_profile.user.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-sm">Upgrade to Librarian</button>
+                    </form>
+                {% else %}
+                    <span class="text-muted">Already Librarian</span>
+                {% endif %}
+                </td>
+            </tr>
+        {% endif %}
+        {% empty %}
+      <tr>
+        <td colspan="4">No users found.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock content %}

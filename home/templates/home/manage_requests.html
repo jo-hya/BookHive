@@ -1,0 +1,108 @@
+<!--
+References
+* 
+-->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage All Requests{% endblock title %}
+
+{% block content %}
+<div class="container my-4">
+
+  <!-- Table #1: Pending Borrow Requests -->
+  <h1>Pending Borrow Requests</h1>
+  {% if pending_borrows %}
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Requester</th>
+          <th>Book</th>
+          <th>Requested At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for req in pending_borrows %}
+        <tr>
+          <td>{{ req.requester.username }}</td>
+          <td>{{ req.book.title }}</td>
+          <td>{{ req.requested_at|date:"M d, Y H:i" }}</td>
+          <td>
+            <!-- <a href="{% url 'process_borrow_request' req.id 'approve' %}" 
+               class="btn btn-success btn-sm">
+               Approve
+            </a>
+            <a href="{% url 'process_borrow_request' req.id 'deny' %}" 
+               class="btn btn-danger btn-sm">
+               Deny
+            </a> -->
+            <form 
+              method="post" 
+              action="{% url 'process_borrow_request' req.id 'approve' %}" 
+              style="display:inline"
+            >
+              {% csrf_token %}
+              <button type="submit" class="btn btn-success btn-sm">
+                Approve
+              </button>
+            </form>
+            <form 
+              method="post" 
+              action="{% url 'process_borrow_request' req.id 'deny' %}" 
+              style="display:inline"
+            >
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm">
+                Deny
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No pending borrow requests.</p>
+  {% endif %}
+
+
+  <!-- Table #2: Pending Collection Access Requests -->
+  <h1 class="mt-5">Pending Collection Access Requests</h1>
+  {% if pending_collections %}
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Requester</th>
+          <th>Collection</th>
+          <th>Requested At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for req in pending_collections %}
+        <tr>
+          <td>{{ req.requester.username }}</td>
+          <td>{{ req.collection.title }}</td>
+          <td>{{ req.requested_at|date:"M d, Y H:i" }}</td>
+          <td>
+            <a href="{% url 'process_collection_request' req.id 'approve' %}" 
+               class="btn btn-success btn-sm">
+               Approve
+            </a>
+            <a href="{% url 'process_collection_request' req.id 'deny' %}" 
+               class="btn btn-danger btn-sm">
+               Deny
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No pending collection access requests.</p>
+  {% endif %}
+
+  <a href="{% url 'librarian_view' %}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+</div>
+{% endblock content %}
